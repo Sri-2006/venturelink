@@ -1,0 +1,23 @@
+{
+  "name": "@venturelink/shared",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Shared TypeScript types and Zod schemas for VentureLink",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts"
+  },
+  "dependencies": {
+    "zod": "^3.23.4"
+  },
+  "devDependencies": {
+    "@venturelink/eslint-config": "workspace:*",
+    "@venturelink/tsconfig": "workspace:*",
+    "typescript": "^5.4.5"
+  }
+}

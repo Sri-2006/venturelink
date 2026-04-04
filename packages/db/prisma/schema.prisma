@@ -1,0 +1,83 @@
+// This is the Prisma schema for VentureLink.
+// datasource and generator will be configured once the database URL is set.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────────────────
+
+enum Role {
+  STARTUP
+  INVESTOR
+  ADMIN
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Models
+// ─────────────────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  startupProfile  StartupProfile?
+  investorProfile InvestorProfile?
+  sentMatches     Match[]          @relation("Sender")
+  receivedMatches Match[]          @relation("Receiver")
+}
+
+model StartupProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName String
+  industry    String
+  stage       String
+  pitchDeck   String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InvestorProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firmName      String?
+  thesis        String?
+  ticketSize    String?
+  focusAreas    String[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Match {
+  id         String      @id @default(cuid())
+  senderId   String
+  receiverId String
+  sender     User        @relation("Sender", fields: [senderId], references: [id])
+  receiver   User        @relation("Receiver", fields: [receiverId], references: [id])
+  status     MatchStatus @default(PENDING)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@unique([senderId, receiverId])
+}
